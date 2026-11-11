@@ -1,0 +1,353 @@
+{
+  "summary": "Existing Demo Bank customers can request and instantly receive a virtual credit card directly within the mobile banking application to enable immediate online purchases. The credit limit is evaluated and assigned automatically through an automated underwriting mechanism without manual intervention. Following issuance, a physical card is dispatched by mail to the customer's registered address, with the annual fee waived for the initial 12-month period.",
+  "business_rules": [
+    {
+      "id": "BR-1",
+      "rule": "Only existing Demo Bank customers are eligible to apply for and receive the virtual credit card in the app.",
+      "source_quote": "We want existing Demo Bank customers to get a virtual credit card instantly in the app, so they can start shopping online right away."
+    },
+    {
+      "id": "BR-2",
+      "rule": "The virtual credit card must be issued instantly in the mobile application upon approval.",
+      "source_quote": "We want existing Demo Bank customers to get a virtual credit card instantly in the app, so they can start shopping online right away."
+    },
+    {
+      "id": "BR-3",
+      "rule": "The credit card limit must be determined automatically without manual underwriter intervention.",
+      "source_quote": "The limit is decided automatically."
+    },
+    {
+      "id": "BR-4",
+      "rule": "A companion physical credit card must be manufactured and dispatched to the customer's address on file after the virtual card issuance.",
+      "source_quote": "The physical card is sent later to the customer's address."
+    },
+    {
+      "id": "BR-5",
+      "rule": "The credit card annual fee must be zero currency units for the first year of account opening.",
+      "source_quote": "There is no annual fee in the first year."
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q-1",
+      "question": "What are the specific customer eligibility criteria (e.g., minimum age of 18, residency, minimum tenure with the bank, existing account in good standing, delinquency status)?",
+      "why_it_matters": "Ineligible or underage customers might gain access to revolving unsecured credit, leading to regulatory fines and elevated credit default.",
+      "category": "eligibility"
+    },
+    {
+      "id": "Q-2",
+      "question": "What is the automated credit limit decision model, what are the minimum and maximum limit boundaries, and what internal/external inputs (e.g., credit bureau score, internal transaction history, net income) feed into it?",
+      "why_it_matters": "Without explicit boundaries and defined data sources, the bank cannot configure underwriting engines or manage portfolio credit exposure.",
+      "category": "limits"
+    },
+    {
+      "id": "Q-3",
+      "question": "How and when is customer consent captured for external credit bureau checks, terms and conditions, and credit agreements prior to automated decisioning?",
+      "why_it_matters": "Running credit inquiries or issuing lines of credit without explicit, documented consumer consent breaches credit reporting and lending regulations.",
+      "category": "regulatory"
+    },
+    {
+      "id": "Q-4",
+      "question": "What specific customer outcome, messaging, and cooldown/re-application rules apply if the customer is declined by the automated decision engine?",
+      "why_it_matters": "Unclear rejection journeys cause customer frustration, call center surges, and potential compliance issues regarding adverse action notices.",
+      "category": "process"
+    },
+    {
+      "id": "Q-5",
+      "question": "How long does physical card delivery take, which delivery provider is used, and can the customer verify or update their delivery address prior to dispatch?",
+      "why_it_matters": "Physical cards sent to outdated addresses result in non-receipt, high replacement costs, and intercepted card fraud.",
+      "category": "process"
+    },
+    {
+      "id": "Q-6",
+      "question": "What strong customer authentication (SCA) or biometric verification is required before displaying sensitive card details (PAN, CVV, expiry date) in the app?",
+      "why_it_matters": "In the event of mobile session hijacking or account takeover, unauthorized parties could copy virtual card details and commit card-not-present fraud.",
+      "category": "ux"
+    },
+    {
+      "id": "Q-7",
+      "question": "What annual fee amount applies starting in year two, how is the anniversary calculated, and how is the customer notified prior to the fee charge?",
+      "why_it_matters": "Lack of transparent fee schedules violates consumer disclosure requirements and triggers unexpected charge disputes in month 13.",
+      "category": "regulatory"
+    },
+    {
+      "id": "Q-8",
+      "question": "What is the fallback or timeout behavior if core card issuing or credit decision service integrations fail during the instant issuance flow?",
+      "why_it_matters": "Service outages could leave customer accounts in an inconsistent state where credit is approved but no card is provisioned.",
+      "category": "integration"
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-1",
+      "description": "Issuing revolving credit lines without mandatory pre-contractual disclosures (SECCI/KFS) or explicit bureau check consent violates consumer lending legislation.",
+      "type": "regulatory"
+    },
+    {
+      "id": "R-2",
+      "description": "Automated decision models relying on incomplete data or failing to account for external debt commitments could approve unaffordable credit limits, causing loan defaults.",
+      "type": "credit"
+    },
+    {
+      "id": "R-3",
+      "description": "Account takeover (ATO) in the mobile app allows fraudsters to instantly spin up virtual cards and deplete credit lines before the legitimate owner detects it.",
+      "type": "fraud"
+    },
+    {
+      "id": "R-4",
+      "description": "Physical cards dispatched automatically to outdated core banking addresses can be intercepted from mailboxes, leading to unauthorized card activation and in-store fraud.",
+      "type": "fraud"
+    },
+    {
+      "id": "R-5",
+      "description": "System delays or downtime between the mobile app gateway, credit engine, and card management platform (CMS) could break the 'instant' promise and leave requests in a pending state.",
+      "type": "technical"
+    },
+    {
+      "id": "R-6",
+      "description": "Fee schedule discrepancies or billing system failures could prematurely charge the annual fee in year one, leading to operational overhead, complaints, and reputational damage.",
+      "type": "operational"
+    },
+    {
+      "id": "R-7",
+      "description": "Discrepancies between customer data stored in the app cache and core banking address records can cause physical cards to be sent to incorrect locations.",
+      "type": "data"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-1",
+      "as_a": "authenticated existing Demo Bank customer",
+      "i_want": "to apply for a credit card in the mobile app and receive an automated credit limit decision instantly",
+      "so_that": "I know immediately if I am approved and what my spending limit is without waiting for manual reviews",
+      "priority": "Must",
+      "source_quote": "We want existing Demo Bank customers to get a virtual credit card instantly in the app, so they can start shopping online right away. The limit is decided automatically.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-1.1",
+          "given": "the user is an existing Demo Bank customer logged into the mobile app who meets the eligibility criteria defined in Q-1",
+          "when": "the user initiates a credit card application and submits consent for automated credit assessment",
+          "then": "the system must evaluate the application automatically within the target response SLA and display the assigned credit limit defined by the decision engine per Q-2."
+        },
+        {
+          "id": "AC-1.2",
+          "given": "an authenticated user who does not meet the eligibility criteria defined in Q-1 or fails the credit assessment defined in Q-2",
+          "when": "the user submits the credit card application",
+          "then": "the application must be declined automatically, an adverse notice must be displayed informing the customer of the decline per Q-4, and no credit card account is created."
+        },
+        {
+          "id": "AC-1.3",
+          "given": "an existing customer submitting a credit card request",
+          "when": "the automated underwriting service times out or is unreachable per Q-8",
+          "then": "the system must display a graceful retry message to the customer, no partial card account must be created, and the customer's existing profile remains unchanged."
+        }
+      ]
+    },
+    {
+      "id": "US-2",
+      "as_a": "newly approved credit card customer",
+      "i_want": "my virtual credit card details to be immediately generated and viewable in the app",
+      "so_that": "I can immediately use the card for online shopping transactions",
+      "priority": "Must",
+      "source_quote": "We want existing Demo Bank customers to get a virtual credit card instantly in the app, so they can start shopping online right away.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-2.1",
+          "given": "the customer has received an approved credit limit decision",
+          "when": "the virtual card generation completes",
+          "then": "the virtual credit card must be available immediately in the mobile app displaying masked card number, cardholder name, and expiry date."
+        },
+        {
+          "id": "AC-2.2",
+          "given": "the approved customer views their new virtual card in the app",
+          "when": "the customer authenticates via the step-up security mechanism defined in Q-6 (e.g., biometrics or PIN)",
+          "then": "the full 16-digit PAN, CVV, and expiry date must be revealed, enabling online checkout."
+        }
+      ]
+    },
+    {
+      "id": "US-3",
+      "as_a": "virtual credit card holder",
+      "i_want": "a physical card to be automatically ordered and delivered to my home address",
+      "so_that": "I can also make payments in physical stores once the card arrives",
+      "priority": "Should",
+      "source_quote": "The physical card is sent later to the customer's address.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-3.1",
+          "given": "the customer has successfully been issued a virtual credit card",
+          "when": "the account creation is finalized",
+          "then": "a physical card production order must be queued for dispatch to the customer's verified residential address on file, with delivery timeframe details communicated per Q-5."
+        },
+        {
+          "id": "AC-3.2",
+          "given": "a queued physical card order",
+          "when": "the card is dispatched by the card manufacturer",
+          "then": "the app status must update to show the card has been shipped and indicate the expected arrival date per Q-5."
+        }
+      ]
+    },
+    {
+      "id": "US-4",
+      "as_a": "new credit card customer",
+      "i_want": "the annual fee to be waived during my first year",
+      "so_that": "I can use the card without paying an annual membership charge for the first 12 months",
+      "priority": "Must",
+      "source_quote": "There is no annual fee in the first year.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-4.1",
+          "given": "a newly opened credit card account",
+          "when": "the account is created and during the initial 365 days of account opening",
+          "then": "the annual fee billed to the account must be 0.00 currency units."
+        },
+        {
+          "id": "AC-4.2",
+          "given": "an active credit card account reaching the first-year anniversary (day 366)",
+          "when": "the annual fee cycle executes",
+          "then": "the regular annual fee defined in Q-7 must be charged in accordance with pre-disclosed terms."
+        }
+      ]
+    }
+  ],
+  "uat_cases": [
+    {
+      "id": "TC-1",
+      "title": "Positive - Eligible existing customer receives automated approval, instant virtual card, and zero fee",
+      "covers": [
+        "AC-1.1",
+        "AC-2.1",
+        "AC-4.1"
+      ],
+      "type": "positive",
+      "preconditions": "User is an existing Demo Bank customer in good standing with active mobile banking credentials and qualifying profile per Q-1.",
+      "steps": [
+        "Log in to the Demo Bank mobile app.",
+        "Navigate to 'Cards' and select 'Apply for Virtual Credit Card'.",
+        "Review consent and terms, then tap 'Submit Application'.",
+        "Observe the decision screen and card management dashboard."
+      ],
+      "expected_result": "Application is approved instantly with an assigned credit limit within engine boundaries (Q-2). The virtual card appears immediately with masked PAN. Account fee summary explicitly confirms 0.00 annual fee for year 1."
+    },
+    {
+      "id": "TC-2",
+      "title": "Negative - Ineligible existing customer is declined automatically",
+      "covers": [
+        "AC-1.2"
+      ],
+      "type": "negative",
+      "preconditions": "User is an existing customer but fails basic eligibility criteria (e.g., active delinquency or underage per Q-1).",
+      "steps": [
+        "Log in to the Demo Bank mobile app.",
+        "Navigate to 'Cards' and tap 'Apply for Virtual Credit Card'.",
+        "Submit the application."
+      ],
+      "expected_result": "Application is rejected immediately by the automated decision engine. A clear decline message is displayed per Q-4. No virtual card or credit account is created, and existing customer accounts remain unaffected."
+    },
+    {
+      "id": "TC-3",
+      "title": "Boundary - Underwriting score exactly at the minimum approval threshold",
+      "covers": [
+        "AC-1.1"
+      ],
+      "type": "boundary",
+      "preconditions": "Customer profile configured with an internal credit score exactly equal to the minimum cutoff threshold defined in Q-2.",
+      "steps": [
+        "Log in to the mobile app.",
+        "Submit credit card application.",
+        "Inspect the decision output."
+      ],
+      "expected_result": "Application is approved with the minimum allowable credit limit tier as defined in Q-2. Virtual card is provisioned instantly."
+    },
+    {
+      "id": "TC-4",
+      "title": "Boundary - Underwriting score one point below minimum approval threshold",
+      "covers": [
+        "AC-1.2"
+      ],
+      "type": "boundary",
+      "preconditions": "Customer profile configured with an internal credit score exactly one point below the minimum cutoff threshold defined in Q-2.",
+      "steps": [
+        "Log in to the mobile app.",
+        "Submit credit card application.",
+        "Inspect the decision output."
+      ],
+      "expected_result": "Application is automatically declined without manual intervention. Appropriate adverse message is displayed per Q-4. No card or line of credit is opened."
+    },
+    {
+      "id": "TC-5",
+      "title": "Negative - Credit decision engine service timeout",
+      "covers": [
+        "AC-1.3"
+      ],
+      "type": "negative",
+      "preconditions": "Underwriting engine gateway is mocked to return HTTP 504 Gateway Timeout.",
+      "steps": [
+        "Log in to the Demo Bank mobile app.",
+        "Submit credit card application."
+      ],
+      "expected_result": "App displays a polite technical error message advising the customer to try again later per Q-8. No orphan card account is created in CMS."
+    },
+    {
+      "id": "TC-6",
+      "title": "Positive - Reveal sensitive virtual card details via step-up authentication",
+      "covers": [
+        "AC-2.2"
+      ],
+      "type": "positive",
+      "preconditions": "Customer has an active newly issued virtual credit card with masked details on screen.",
+      "steps": [
+        "Tap 'Show Card Details' on the virtual card in the app.",
+        "Prompt for biometric/PIN verification appears.",
+        "Successfully authenticate using valid biometrics."
+      ],
+      "expected_result": "Full 16-digit PAN, expiration date (MM/YY), and 3-digit CVV become visible with a copy-to-clipboard option for online purchases."
+    },
+    {
+      "id": "TC-7",
+      "title": "Negative - Failed step-up authentication when attempting to reveal card details",
+      "covers": [
+        "AC-2.2"
+      ],
+      "type": "negative",
+      "preconditions": "Customer has an active virtual credit card displayed in masked format.",
+      "steps": [
+        "Tap 'Show Card Details'.",
+        "Enter an incorrect PIN or fail biometric check 3 consecutive times."
+      ],
+      "expected_result": "Card details remain fully masked. An authentication failure error is displayed, and the reveal action is temporarily locked to prevent credential brute-forcing."
+    },
+    {
+      "id": "TC-8",
+      "title": "Positive - Physical card order created and dispatched to registered address",
+      "covers": [
+        "AC-3.1",
+        "AC-3.2"
+      ],
+      "type": "positive",
+      "preconditions": "Customer has completed virtual card issuance; valid address exists on profile.",
+      "steps": [
+        "Verify core banking card production queue.",
+        "Trigger dispatch event from the card personalization vendor mock.",
+        "Open the mobile app and check card delivery tracking status."
+      ],
+      "expected_result": "A physical card dispatch record exists for the customer's registered address. App tracking status transitions to 'Dispatched' with an estimated delivery date per Q-5."
+    },
+    {
+      "id": "TC-9",
+      "title": "Boundary - Annual fee waiver on Day 365 vs fee assessment on Day 366",
+      "covers": [
+        "AC-4.1",
+        "AC-4.2"
+      ],
+      "type": "boundary",
+      "preconditions": "A credit card account opened on Day 0 with first-year fee waiver active.",
+      "steps": [
+        "Simulate batch billing run on Day 365 from card opening.",
+        "Verify account statement and fee ledger.",
+        "Simulate batch billing run on Day 366 (start of Year 2)."
+      ],
+      "expected_result": "On Day 365, annual fee charged is exactly 0.00. On Day 366, standard annual fee (defined in Q-7) is posted to the account balance."
+    }
+  ]
+}

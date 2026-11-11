@@ -1,0 +1,1 @@
+Demo Bank wants customers to be able to defer one monthly instalment of their consumer loan from the mobile app, once per year. The deferred instalment is added to the end of the loan. Customers who are late on payments cannot use this option.

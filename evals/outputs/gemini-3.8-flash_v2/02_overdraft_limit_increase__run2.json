@@ -1,0 +1,286 @@
+{
+  "summary": "This requirement enables existing Demo Bank overdraft customers to request an overdraft limit increase directly through the mobile application. Eligible requests can be approved up to a maximum ceiling of three times the customer's monthly salary, with approved limits taking effect immediately. If an increase request is declined, the customer's existing overdraft limit remains unaffected.",
+  "business_rules": [
+    {
+      "id": "BR-1",
+      "rule": "Only customers holding an existing active overdraft facility at Demo Bank are eligible to request an overdraft limit increase via the mobile app.",
+      "source_quote": "Customers who already have an overdraft at Demo Bank should be able to request a higher limit from the mobile app."
+    },
+    {
+      "id": "BR-2",
+      "rule": "The maximum permissible new overdraft limit cannot exceed 3 times the customer's monthly salary.",
+      "source_quote": "The new limit can be up to 3 times the monthly salary."
+    },
+    {
+      "id": "BR-3",
+      "rule": "Upon system approval of the limit increase request, the newly approved overdraft limit must be activated and available immediately.",
+      "source_quote": "The system checks the request and, if approved, the new limit is active immediately."
+    },
+    {
+      "id": "BR-4",
+      "rule": "If the limit increase request is rejected, the customer's current overdraft limit must remain unchanged.",
+      "source_quote": "If the request is not approved, the customer keeps the current limit."
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q-1",
+      "question": "How is 'monthly salary' defined, verified, and calculated (e.g., net vs. gross, average regular payroll credits over the last 3 or 6 months, or declared income verified via open banking/payslip)?",
+      "why_it_matters": "Without a deterministic calculation, the maximum limit boundary cannot be coded, exposing the bank to severe credit risk or improper approvals.",
+      "category": "data"
+    },
+    {
+      "id": "Q-2",
+      "question": "What specific underwriting criteria constitute the system check (e.g., external credit bureau check, internal risk score, DTI/affordability checks, absence of delinquency or payment arrears)?",
+      "why_it_matters": "The development and decision engine teams cannot implement the automated approval logic without explicit credit policy rules.",
+      "category": "process"
+    },
+    {
+      "id": "Q-3",
+      "question": "Is explicit customer consent required prior to executing an external credit bureau search or accessing Open Banking data, and is a hard or soft credit pull performed?",
+      "why_it_matters": "Running unauthorized hard credit checks violates consumer credit regulations (e.g., GDPR, FCRA/CCA) and damages customer credit scores.",
+      "category": "regulatory"
+    },
+    {
+      "id": "Q-4",
+      "question": "What are the absolute minimum and maximum absolute monetary boundaries for an overdraft limit (e.g., minimum increase of $100, maximum bank-wide cap of $10,000 regardless of salary)?",
+      "why_it_matters": "High-earning customers could otherwise qualify for disproportionate unsecured exposure without senior management sign-off.",
+      "category": "limits"
+    },
+    {
+      "id": "Q-5",
+      "question": "What is the cooldown or re-application waiting period if a customer's limit increase request is rejected (e.g., 30, 60, or 90 days)?",
+      "why_it_matters": "Without rate-limiting or cooldown logic, rejected customers could flood the decision engine and credit bureau APIs with repeated daily requests.",
+      "category": "process"
+    },
+    {
+      "id": "Q-6",
+      "question": "What exact notification and adverse action messaging must be displayed in the mobile app when a request is rejected, times out, or requires manual underwriter review?",
+      "why_it_matters": "Regulatory compliance mandates transparent adverse action notices, and poor error communication leads to elevated call centre volumes.",
+      "category": "ux"
+    },
+    {
+      "id": "Q-7",
+      "question": "What customer eligibility prerequisites apply regarding account standing, residency, age, or minimum tenure with Demo Bank?",
+      "why_it_matters": "Customers in default, deceased status, bankruptcy, or non-resident tax status could inadvertently obtain credit extensions.",
+      "category": "eligibility"
+    },
+    {
+      "id": "Q-8",
+      "question": "What step-up authentication (e.g., biometric, SMS/push OTP) is mandated before submitting the limit increase request?",
+      "why_it_matters": "Prevents unauthorized limit increases if a device is unlocked or compromised via account takeover.",
+      "category": "process"
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-1",
+      "description": "Failure to obtain explicit customer consent before initiating an external credit bureau bureau inquiry creates regulatory non-compliance and exposure to statutory fines.",
+      "type": "regulatory"
+    },
+    {
+      "id": "R-2",
+      "description": "Automated approval up to 3x salary without verifying external debt commitments and disposable income could lead to unaffordable lending, regulatory sanctions, and elevated loan default rates.",
+      "type": "credit"
+    },
+    {
+      "id": "R-3",
+      "description": "Account Takeover (ATO) or malware on mobile devices could allow fraudsters to increase overdraft limits and immediately siphon out funds before detection.",
+      "type": "fraud"
+    },
+    {
+      "id": "R-4",
+      "description": "Decisioning engine or external credit bureau service outages during mobile request processing could leave applications in an ambiguous pending state, degrading customer experience.",
+      "type": "technical"
+    },
+    {
+      "id": "R-5",
+      "description": "Outdated, volatile, or incorrect salary deposit records stored in the core banking system could miscalculate the maximum borrowing multiplier, improperly granting or denying credit.",
+      "type": "data"
+    },
+    {
+      "id": "R-6",
+      "description": "Immediate activation of high overdraft lines without real-time core banking synchronization could lead to operational reconciliation breaks or intraday liquidity imbalances.",
+      "type": "operational"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-1",
+      "as_a": "mobile banking customer with an active Demo Bank overdraft",
+      "i_want": "to request an increase to my existing overdraft limit up to 3 times my monthly salary directly in the mobile app",
+      "so_that": "I can access additional funds when needed without visiting a branch",
+      "priority": "Must",
+      "source_quote": "Customers who already have an overdraft at Demo Bank should be able to request a higher limit from the mobile app. The new limit can be up to 3 times the monthly salary.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-1.1",
+          "given": "the customer has an active overdraft facility and logs into the mobile app",
+          "when": "the customer navigates to the overdraft management screen",
+          "then": "the system displays the current overdraft limit, the maximum eligible limit calculated as 3 times the monthly salary (defined per Q-1 and Q-4), and an input field to enter the desired higher limit."
+        },
+        {
+          "id": "AC-1.2",
+          "given": "the customer enters a requested limit amount",
+          "when": "the entered amount is less than or equal to the current overdraft limit, or greater than 3 times the verified monthly salary",
+          "then": "the mobile app prevents submission and displays an inline validation message indicating the valid amount range."
+        },
+        {
+          "id": "AC-1.3",
+          "given": "a customer does not have an existing overdraft facility with Demo Bank",
+          "when": "the customer accesses the overdraft section in the mobile app",
+          "then": "the limit increase option is not accessible, and an appropriate message or standard new-application flow is presented."
+        }
+      ]
+    },
+    {
+      "id": "US-2",
+      "as_a": "customer requesting an overdraft limit increase",
+      "i_want": "the system to process my request and immediately activate the new limit if approved, or keep my current limit unchanged if declined",
+      "so_that": "I have immediate clarity and access to approved credit without losing my existing facility if not approved",
+      "priority": "Must",
+      "source_quote": "The system checks the request and, if approved, the new limit is active immediately. If the request is not approved, the customer keeps the current limit.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-2.1",
+          "given": "a valid requested limit up to 3 times monthly salary",
+          "when": "the system checks the request against underwriting rules (defined per Q-2) and approves it",
+          "then": "the core banking system immediately updates the active overdraft limit to the new amount, displays an immediate approval confirmation in the mobile app, and updates available balance reflecting the new limit."
+        },
+        {
+          "id": "AC-2.2",
+          "given": "a valid requested limit up to 3 times monthly salary",
+          "when": "the system checks the request against underwriting rules (defined per Q-2) and rejects it",
+          "then": "the existing overdraft limit and available balance remain completely unchanged, and the customer is presented with an adverse decision screen (per Q-6) explaining next steps."
+        },
+        {
+          "id": "AC-2.3",
+          "given": "a submitted overdraft limit increase request",
+          "when": "a downstream system or credit bureau service times out or errors during evaluation",
+          "then": "the customer's existing overdraft limit remains unchanged, and an error message is shown advising them that their existing limit is intact and instructing them when to retry."
+        }
+      ]
+    }
+  ],
+  "uat_cases": [
+    {
+      "id": "TC-1",
+      "title": "Eligible customer views current limit and maximum eligible limit (Positive)",
+      "covers": [
+        "AC-1.1"
+      ],
+      "type": "positive",
+      "preconditions": "Customer A has an active checking account with an existing overdraft limit of $1,000 and verified net monthly salary of $3,000 (maximum cap is $9,000).",
+      "steps": [
+        "Log in to Demo Bank mobile app as Customer A.",
+        "Navigate to 'Account Details' > 'Overdraft Settings'.",
+        "Select 'Request Higher Limit'."
+      ],
+      "expected_result": "Screen displays current limit of $1,000, indicates maximum available limit of $9,000 (3x $3,000), and provides an input field for the requested amount."
+    },
+    {
+      "id": "TC-2",
+      "title": "Request limit exactly at 3x monthly salary boundary - Approved (Boundary)",
+      "covers": [
+        "AC-1.1",
+        "AC-2.1"
+      ],
+      "type": "boundary",
+      "preconditions": "Customer A has an existing overdraft of $1,000, verified monthly salary of $3,000 (3x limit = $9,000), and satisfies all credit approval criteria.",
+      "steps": [
+        "Log in as Customer A and navigate to 'Request Higher Limit'.",
+        "Enter exactly $9,000 into the requested limit field.",
+        "Authenticate and submit the request."
+      ],
+      "expected_result": "Request is approved immediately. Mobile app confirms approval, and account details immediately reflect active overdraft limit of $9,000."
+    },
+    {
+      "id": "TC-3",
+      "title": "Request limit just below 3x monthly salary boundary - Approved (Boundary)",
+      "covers": [
+        "AC-1.1",
+        "AC-2.1"
+      ],
+      "type": "boundary",
+      "preconditions": "Customer A has an existing overdraft of $1,000, verified monthly salary of $3,000 (3x limit = $9,000), and meets all credit approval criteria.",
+      "steps": [
+        "Log in as Customer A and navigate to 'Request Higher Limit'.",
+        "Enter $8,999 into the requested limit field.",
+        "Authenticate and submit the request."
+      ],
+      "expected_result": "Request is approved immediately. Confirmation screen appears and new active limit is $8,999."
+    },
+    {
+      "id": "TC-4",
+      "title": "Request limit just above 3x monthly salary boundary - Client Validation Rejection (Boundary)",
+      "covers": [
+        "AC-1.2"
+      ],
+      "type": "boundary",
+      "preconditions": "Customer A has an existing overdraft of $1,000 and verified monthly salary of $3,000 (3x limit = $9,000).",
+      "steps": [
+        "Log in as Customer A and navigate to 'Request Higher Limit'.",
+        "Enter $9,001 into the requested limit field.",
+        "Attempt to tap 'Submit Request'."
+      ],
+      "expected_result": "The submission button remains disabled or returns an immediate validation error: 'Requested limit cannot exceed $9,000 (3 times your monthly salary)'. No request is dispatched to the backend."
+    },
+    {
+      "id": "TC-5",
+      "title": "Request limit equal to or lower than existing overdraft limit (Negative)",
+      "covers": [
+        "AC-1.2"
+      ],
+      "type": "negative",
+      "preconditions": "Customer A has an existing overdraft limit of $1,000.",
+      "steps": [
+        "Log in as Customer A and navigate to 'Request Higher Limit'.",
+        "Enter $1,000 (or $950) into the requested limit field.",
+        "Attempt to submit the request."
+      ],
+      "expected_result": "System displays validation error: 'Requested limit must be greater than your current limit of $1,000'. Request cannot be submitted."
+    },
+    {
+      "id": "TC-6",
+      "title": "Customer without existing overdraft attempts to access increase feature (Negative)",
+      "covers": [
+        "AC-1.3"
+      ],
+      "type": "negative",
+      "preconditions": "Customer B holds an active current account with Demo Bank with no existing overdraft facility ($0 limit).",
+      "steps": [
+        "Log in as Customer B on the mobile app.",
+        "Navigate to 'Account Details' > 'Overdraft Settings'."
+      ],
+      "expected_result": "The 'Request Higher Limit' option is not displayed or displays a prompt to 'Apply for an Overdraft' under standard acquisition flow."
+    },
+    {
+      "id": "TC-7",
+      "title": "System rejects request due to credit score failure - Current limit preserved (Negative)",
+      "covers": [
+        "AC-2.2"
+      ],
+      "type": "negative",
+      "preconditions": "Customer C has an existing overdraft limit of $1,500, monthly salary of $4,000, but fails internal risk scoring/bureau credit check.",
+      "steps": [
+        "Log in as Customer C and request a limit increase to $5,000 (within 3x salary ceiling).",
+        "Submit request."
+      ],
+      "expected_result": "System returns a decline outcome screen. Customer's active overdraft limit remains exactly $1,500 with no balance alterations or penalty fees applied."
+    },
+    {
+      "id": "TC-8",
+      "title": "Decision engine downstream service timeout during submission (Negative)",
+      "covers": [
+        "AC-2.3"
+      ],
+      "type": "negative",
+      "preconditions": "Customer A submits a valid increase request; backend underwriting service is configured to simulate a connection timeout (HTTP 504).",
+      "steps": [
+        "Submit valid limit increase request for $5,000 as Customer A.",
+        "Observe system response upon timeout."
+      ],
+      "expected_result": "System fails safely with user message: 'Unable to process your request at this time. Your current limit of $1,000 remains unchanged. Please try again later.' Active limit remains $1,000."
+    }
+  ]
+}

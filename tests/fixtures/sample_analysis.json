@@ -1,0 +1,44 @@
+{
+  "summary": "Demo Bank will offer a fully online consumer loan in the mobile app for customers whose salary is paid into Demo Bank, up to 1,000,000 ALL. The decision is automatic and approved funds are disbursed the same day to the customer's current account. Customers with a bad credit history are declined.",
+  "business_rules": [
+    {"id": "BR-1", "rule": "Only customers whose salary is paid into Demo Bank can apply.", "source_quote": "Customers whose salary is paid into Demo Bank can apply for a loan up to 1,000,000 ALL."},
+    {"id": "BR-2", "rule": "The maximum loan amount is 1,000,000 ALL.", "source_quote": "Customers whose salary is paid into Demo Bank can apply for a loan up to 1,000,000 ALL."},
+    {"id": "BR-3", "rule": "Applicants with a bad credit history are declined.", "source_quote": "Customers with a bad credit history should not get the loan."}
+  ],
+  "open_questions": [
+    {"id": "Q-1", "question": "What is the minimum and maximum age of the applicant at application and at loan maturity?", "why_it_matters": "Age limits drive eligibility and the maximum term.", "category": "eligibility"},
+    {"id": "Q-2", "question": "How many consecutive salary payments must the customer have received?", "why_it_matters": "A single salary payment is weak evidence of stable income.", "category": "eligibility"},
+    {"id": "Q-3", "question": "How is bad credit history defined, e.g. days past due in the last 12 months?", "why_it_matters": "Without a definition the decision rule cannot be built or tested.", "category": "eligibility"},
+    {"id": "Q-4", "question": "What maximum debt-to-income ratio applies, and are existing loans at other banks included?", "why_it_matters": "Affordability is a regulatory expectation for consumer lending.", "category": "regulatory"},
+    {"id": "Q-5", "question": "If an application is approved after the payment cut-off time or on a weekend, when is the money disbursed?", "why_it_matters": "Same-day disbursement may not be possible outside working hours.", "category": "process"}
+  ],
+  "risks": [
+    {"id": "R-1", "description": "Credit bureau checks require explicit customer consent captured before the check.", "type": "regulatory"},
+    {"id": "R-2", "description": "Account takeover could lead to fraudulent loan applications; contract signing needs strong authentication such as OTP.", "type": "fraud"}
+  ],
+  "stories": [
+    {
+      "id": "US-1", "as_a": "salaried customer", "i_want": "to choose the amount and term and see my monthly instalment",
+      "so_that": "I know what I will pay before applying", "priority": "Must",
+      "source_quote": "The customer chooses the amount and the term, sees the monthly instalment and submits the application.",
+      "acceptance_criteria": [
+        {"id": "AC-1.1", "given": "an eligible customer on the loan calculator", "when": "they enter an amount and term within the allowed range", "then": "the monthly instalment is displayed"},
+        {"id": "AC-1.2", "given": "an eligible customer on the loan calculator", "when": "they enter an amount above 1,000,000 ALL", "then": "an error is shown and they cannot continue"}
+      ]
+    },
+    {
+      "id": "US-2", "as_a": "salaried customer", "i_want": "an automatic decision on my application",
+      "so_that": "I get the money the same day", "priority": "Must",
+      "source_quote": "The decision should be automatic and the money should arrive in the customer's current account the same day.",
+      "acceptance_criteria": [
+        {"id": "AC-2.1", "given": "a submitted application from a customer with good credit history", "when": "the decision engine approves it", "then": "the amount is credited to the current account the same working day"},
+        {"id": "AC-2.2", "given": "a submitted application from a customer with bad credit history (see Q-3)", "when": "the decision engine evaluates it", "then": "the application is declined and the customer is informed"}
+      ]
+    }
+  ],
+  "uat_cases": [
+    {"id": "TC-1", "title": "Instalment shown for valid amount and term", "covers": ["AC-1.1"], "type": "positive", "preconditions": "Fictional customer with salary paid into Demo Bank", "steps": ["Open loan calculator", "Enter 500,000 ALL and 36 months"], "expected_result": "Monthly instalment is displayed"},
+    {"id": "TC-2", "title": "Amount above maximum is blocked", "covers": ["AC-1.2"], "type": "boundary", "preconditions": "Fictional eligible customer", "steps": ["Open loan calculator", "Enter 1,000,001 ALL"], "expected_result": "Error shown, Continue is disabled"},
+    {"id": "TC-3", "title": "Approved loan is disbursed same day", "covers": ["AC-2.1"], "type": "positive", "preconditions": "Fictional customer with clean credit history, before cut-off", "steps": ["Submit application", "Wait for decision"], "expected_result": "Loan approved and amount credited to current account"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "03_virtual_credit_card",
+  "title": "Instant virtual credit card",
+  "requirement": "We want existing Demo Bank customers to get a virtual credit card instantly in the app, so they can start shopping online right away. The limit is decided automatically. The physical card is sent later to the customer's address. There is no annual fee in the first year.",
+  "expectations": [
+    {"id": "E1", "description": "Asks how the limit is calculated and its min/max", "sections": ["open_questions"], "any_of": ["minimum limit", "maximum limit", "how the limit", "limit is calculated", "limit calculation", "limit range"]},
+    {"id": "E2", "description": "Asks which existing customers are eligible", "sections": ["open_questions"], "any_of": ["eligible", "eligibility", "which customers", "existing customer"]},
+    {"id": "E3", "description": "Asks about the address used for the physical card", "sections": ["open_questions", "risks"], "any_of": ["address"]},
+    {"id": "E4", "description": "Asks what fee applies after the first year", "sections": ["open_questions"], "any_of": ["after the first year", "second year", "annual fee"]},
+    {"id": "E5", "description": "Raises card fraud / card-not-present risk", "sections": ["risks"], "any_of": ["fraud", "card-not-present", "3-d secure", "3ds"]},
+    {"id": "E6", "description": "Raises secure display of card details (PAN/CVV)", "sections": ["open_questions", "risks", "acceptance_criteria"], "any_of": ["cvv", "pan", "card number", "card details"]},
+    {"id": "E7", "description": "Raises consent / credit bureau check", "sections": ["open_questions", "risks", "acceptance_criteria"], "any_of": ["consent", "credit bureau"]},
+    {"id": "E8", "description": "Has a UAT case for a customer who is not eligible", "sections": ["uat_cases"], "any_of": ["not eligible", "ineligible", "declined", "rejected"]},
+    {"id": "E9", "description": "Has a UAT case for using the virtual card online", "sections": ["uat_cases"], "any_of": ["online purchase", "online payment", "e-commerce", "online transaction", "shopping online"]}
+  ]
+}

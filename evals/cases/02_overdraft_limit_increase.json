@@ -1,0 +1,16 @@
+{
+  "id": "02_overdraft_limit_increase",
+  "title": "Overdraft limit increase in the mobile app",
+  "requirement": "Customers who already have an overdraft at Demo Bank should be able to request a higher limit from the mobile app. The new limit can be up to 3 times the monthly salary. The system checks the request and, if approved, the new limit is active immediately. If the request is not approved, the customer keeps the current limit.",
+  "expectations": [
+    {"id": "E1", "description": "Asks which salary figure is used (net, average, last month)", "sections": ["open_questions"], "any_of": ["net", "gross", "average", "last month", "which salary"]},
+    {"id": "E2", "description": "Asks how often a customer can request an increase", "sections": ["open_questions"], "any_of": ["how often", "frequency", "cooling", "waiting period", "once per", "repeat"]},
+    {"id": "E3", "description": "Asks about customers whose overdraft is currently overdrawn or in arrears", "sections": ["open_questions", "risks"], "any_of": ["arrears", "overdue", "past due", "overdrawn", "delinquen"]},
+    {"id": "E4", "description": "Asks about customers whose salary is not paid into Demo Bank", "sections": ["open_questions"], "any_of": ["salary is not paid", "not paid into", "salary account", "salary domiciliation", "salary at demo bank", "salary to demo bank"]},
+    {"id": "E5", "description": "States the 3x salary rule as a business rule", "sections": ["business_rules"], "any_of": ["3 times", "three times", "3x"]},
+    {"id": "E6", "description": "Raises contract amendment / customer acceptance of new terms", "sections": ["open_questions", "risks", "acceptance_criteria"], "any_of": ["amendment", "accept the new", "terms and conditions", "contract", "sign"]},
+    {"id": "E7", "description": "Has a boundary UAT case at exactly 3x salary", "sections": ["uat_cases"], "any_of": ["exactly 3", "exactly three", "equal to 3", "equal to three"]},
+    {"id": "E8", "description": "Has a UAT case above 3x salary", "sections": ["uat_cases"], "any_of": ["above 3", "exceeds 3", "more than 3", "above three", "exceeds three", "more than three", "greater than"]},
+    {"id": "E9", "description": "Has a UAT case confirming the current limit is kept after rejection", "sections": ["uat_cases"], "any_of": ["current limit", "unchanged", "remains", "keeps"]}
+  ]
+}

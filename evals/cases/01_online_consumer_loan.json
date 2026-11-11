@@ -1,0 +1,18 @@
+{
+  "id": "01_online_consumer_loan",
+  "title": "Online consumer loan for salaried customers",
+  "requirement": "Demo Bank wants to launch a fully online consumer loan in the mobile app. Customers whose salary is paid into Demo Bank can apply for a loan up to 1,000,000 ALL. The customer chooses the amount and the term, sees the monthly instalment and submits the application. The decision should be automatic and the money should arrive in the customer's current account the same day. Customers with a bad credit history should not get the loan.",
+  "expectations": [
+    {"id": "E1", "description": "Asks about minimum/maximum age", "sections": ["open_questions"], "any_of": ["age", "years old"]},
+    {"id": "E2", "description": "Asks how many salary payments / how long salary must be received", "sections": ["open_questions"], "any_of": ["consecutive", "how many salary", "months of salary", "salary history", "salary payments"]},
+    {"id": "E3", "description": "Asks about minimum amount and allowed terms", "sections": ["open_questions"], "any_of": ["minimum amount", "minimum loan", "term range", "minimum and maximum term", "allowed terms", "term options"]},
+    {"id": "E4", "description": "Asks how 'bad credit history' is defined", "sections": ["open_questions"], "any_of": ["bad credit history", "define", "definition", "days past due", "dpd"]},
+    {"id": "E5", "description": "Raises affordability / debt-to-income or existing loans", "sections": ["open_questions", "business_rules", "risks"], "any_of": ["debt-to-income", "dti", "affordability", "existing loan", "existing obligations"]},
+    {"id": "E6", "description": "Raises credit bureau consent", "sections": ["open_questions", "risks", "acceptance_criteria"], "any_of": ["consent"]},
+    {"id": "E7", "description": "Raises contract signing / identity confirmation", "sections": ["open_questions", "risks", "stories"], "any_of": ["sign", "otp", "authenticat", "identity"]},
+    {"id": "E8", "description": "Raises what 'same day' means after cut-off time or on non-working days", "sections": ["open_questions", "risks"], "any_of": ["cut-off", "cutoff", "weekend", "holiday", "non-working"]},
+    {"id": "E9", "description": "Has a UAT case for amount above 1,000,000 ALL", "sections": ["uat_cases"], "any_of": ["1,000,001", "1000001", "above the maximum", "exceeds the maximum", "above 1,000,000", "more than 1,000,000"]},
+    {"id": "E10", "description": "Has a UAT case for a customer without salary at Demo Bank", "sections": ["uat_cases"], "any_of": ["no salary", "not paid", "without salary", "salary is not", "non-salaried"]},
+    {"id": "E11", "description": "Has a UAT case for rejection due to credit history", "sections": ["uat_cases"], "any_of": ["rejected", "declined", "rejection"]}
+  ]
+}

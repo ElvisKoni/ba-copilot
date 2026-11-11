@@ -1,0 +1,307 @@
+{
+  "summary": "Demo Bank is introducing an end-to-end digital consumer loan within its mobile banking application for existing payroll customers, offering financing up to 1,000,000 ALL. Eligible customers configure their preferred loan amount and repayment tenure, review the calculated monthly instalment, and submit their application for automated real-time underwriting. Upon automated approval and provided the applicant does not possess an adverse credit history, loan proceeds are disbursed directly to the applicant's current account within the same calendar day.",
+  "business_rules": [
+    {
+      "id": "BR-1",
+      "rule": "The loan application channel must be fully digital and hosted within Demo Bank's mobile application.",
+      "source_quote": "Demo Bank wants to launch a fully online consumer loan in the mobile app."
+    },
+    {
+      "id": "BR-2",
+      "rule": "Applicants must have their salary deposited into an active Demo Bank account to be eligible to apply.",
+      "source_quote": "Customers whose salary is paid into Demo Bank can apply for a loan up to 1,000,000 ALL."
+    },
+    {
+      "id": "BR-3",
+      "rule": "The maximum loan amount a customer can apply for is 1,000,000 ALL.",
+      "source_quote": "Customers whose salary is paid into Demo Bank can apply for a loan up to 1,000,000 ALL."
+    },
+    {
+      "id": "BR-4",
+      "rule": "The mobile application must require the customer to select the loan amount and the repayment term, and must calculate and display the corresponding monthly instalment prior to submission.",
+      "source_quote": "The customer chooses the amount and the term, sees the monthly instalment and submits the application."
+    },
+    {
+      "id": "BR-5",
+      "rule": "The credit decisioning process must execute automatically without requiring manual back-office underwriter intervention.",
+      "source_quote": "The decision should be automatic and the money should arrive in the customer's current account the same day."
+    },
+    {
+      "id": "BR-6",
+      "rule": "Approved loan funds must be disbursed directly into the customer's Demo Bank current account on the same day the application is approved.",
+      "source_quote": "The decision should be automatic and the money should arrive in the customer's current account the same day."
+    },
+    {
+      "id": "BR-7",
+      "rule": "Applicants identified as having a bad credit history must be declined for the loan.",
+      "source_quote": "Customers with a bad credit history should not get the loan."
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q-1",
+      "question": "What specific criteria define a customer 'whose salary is paid into Demo Bank' (e.g., how many consecutive months of salary deposits are required, minimum monthly net salary amount, and specific transaction codes)?",
+      "why_it_matters": "Without strict criteria, customers with one-off deposits or irregular inflows could apply, causing credit policy breaches or system rejection downstream.",
+      "category": "eligibility"
+    },
+    {
+      "id": "Q-2",
+      "question": "What are the minimum allowable loan amount, minimum term, and maximum allowable term (in months)?",
+      "why_it_matters": "Developers cannot configure input slider boundaries or input validation rules without predefined minimum and maximum limits.",
+      "category": "limits"
+    },
+    {
+      "id": "Q-3",
+      "question": "What exact definition and metrics constitute 'bad credit history' (e.g., external credit bureau score cut-off, internal DPD > 30/60/90 days, write-offs, or active restructuring)?",
+      "why_it_matters": "Automated credit scoring rules cannot be codified or audited without explicit numerical cut-offs and risk policy definitions.",
+      "category": "regulatory"
+    },
+    {
+      "id": "Q-4",
+      "question": "How is customer legal consent obtained for credit bureau inquiry, and how is the digital loan agreement executed (e.g., SMS OTP, biometric signature, or in-app qualified digital signature)?",
+      "why_it_matters": "Lending without verifiable, legally binding consent and contract execution creates severe regulatory violations and unenforceability of debt under consumer lending regulations.",
+      "category": "regulatory"
+    },
+    {
+      "id": "Q-5",
+      "question": "What is the exact same-day disbursement cut-off time (e.g., 16:30), and what occurs if an application is submitted or approved after this cut-off, on weekends, or during bank holidays?",
+      "why_it_matters": "Setting customer expectations and configuring batch vs. real-time payment settlement queues depends on defined operational cut-off times.",
+      "category": "process"
+    },
+    {
+      "id": "Q-6",
+      "question": "What specific error screens, decline reasons, or cooling-off periods (re-application lockout duration) are presented to a customer upon automated rejection?",
+      "why_it_matters": "Customer service teams could be overwhelmed by repetitive inquiries if decline messaging and re-application wait periods are undefined.",
+      "category": "ux"
+    },
+    {
+      "id": "Q-7",
+      "question": "What pricing model is used to compute the monthly instalment (e.g., fixed vs. variable interest rate, compounding frequency, admin/disbursement fees, credit life insurance)?",
+      "why_it_matters": "Instalment calculation algorithms cannot be built or validated for regulatory APR compliance without knowing the exact formula and fee schedule.",
+      "category": "data"
+    },
+    {
+      "id": "Q-8",
+      "question": "What automated fallback or retry mechanism applies if core banking account crediting fails post-approval?",
+      "why_it_matters": "Technical failures could leave an approved loan account open in the loan ledger while the customer never receives funds in their current account.",
+      "category": "integration"
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-1",
+      "description": "Non-compliance with national consumer lending regulations regarding mandatory pre-contractual disclosures (SECCI), clear APR representation, and data protection consent for credit bureau pull.",
+      "type": "regulatory"
+    },
+    {
+      "id": "R-2",
+      "description": "Excessive default rates resulting from under-defined credit underwriting criteria, lack of Debt-Service-to-Income (DSTI) verification, and reliance solely on internal salary indicators.",
+      "type": "credit"
+    },
+    {
+      "id": "R-3",
+      "description": "Account takeover (ATO) and identity theft where malicious actors gain access to a customer's unlocked mobile app session to withdraw loan funds to compromised accounts.",
+      "type": "fraud"
+    },
+    {
+      "id": "R-4",
+      "description": "Operational backlog and customer complaints if same-day disbursement commitments are missed due to weekend processing freezes, core payment system downtime, or clearing delays.",
+      "type": "operational"
+    },
+    {
+      "id": "R-5",
+      "description": "Microservice timeout or integration failure between the mobile front-end, credit bureau gateway, and core banking system leading to orphaned applications or duplicate disbursements.",
+      "type": "technical"
+    },
+    {
+      "id": "R-6",
+      "description": "Data inconsistency or misclassification of non-payroll deposits as salary due to imprecise transaction categorization rules.",
+      "type": "data"
+    }
+  ],
+  "stories": [
+    {
+      "id": "US-1",
+      "as_a": "Demo Bank payroll customer",
+      "i_want": "to select my desired loan amount up to 1,000,000 ALL and loan term in the mobile app, and immediately see the estimated monthly instalment",
+      "so_that": "I can evaluate loan affordability before deciding to submit an application",
+      "priority": "Must",
+      "source_quote": "The customer chooses the amount and the term, sees the monthly instalment and submits the application.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-1.1",
+          "given": "The customer is logged into the mobile app and is confirmed as a salary-receiving customer per criteria defined in Q-1",
+          "when": "The customer navigates to the loan configuration screen",
+          "then": "The customer can input or select a loan amount up to a maximum limit of 1,000,000 ALL and a term within the parameters to be defined in Q-2"
+        },
+        {
+          "id": "AC-1.2",
+          "given": "The customer is on the loan configuration screen",
+          "when": "The customer modifies the loan amount or the term",
+          "then": "The mobile app dynamically recalculates and displays the monthly instalment using the approved pricing formula per Q-7"
+        },
+        {
+          "id": "AC-1.3",
+          "given": "The customer is entering a loan amount on the configuration screen",
+          "when": "The customer enters an amount greater than 1,000,000 ALL or less than the minimum defined in Q-2",
+          "then": "The application blocks submission and displays a validation error indicating the allowable amount boundaries"
+        }
+      ]
+    },
+    {
+      "id": "US-2",
+      "as_a": "Demo Bank payroll customer",
+      "i_want": "to submit my completed loan application and receive an immediate automated decision",
+      "so_that": "I can know instantly whether my loan request has been approved without visiting a branch",
+      "priority": "Must",
+      "source_quote": "The decision should be automatic and the money should arrive in the customer's current account the same day. Customers with a bad credit history should not get the loan.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-2.1",
+          "given": "The customer has configured a valid amount and term and provided mandatory bureau consent per Q-4",
+          "when": "The customer taps the submit application button",
+          "then": "The automated decision engine evaluates internal and external credit criteria without manual intervention"
+        },
+        {
+          "id": "AC-2.2",
+          "given": "An applicant whose credit profile meets all positive underwriting criteria and has no bad credit history per Q-3",
+          "when": "The automated decision engine completes evaluation",
+          "then": "The application status is set to Approved and an approval confirmation screen is displayed to the customer"
+        },
+        {
+          "id": "AC-2.3",
+          "given": "An applicant identified with a bad credit history based on the threshold defined in Q-3",
+          "when": "The automated decision engine processes the application",
+          "then": "The application is automatically transitioned to Rejected and the customer is presented with the decline notification per Q-6"
+        }
+      ]
+    },
+    {
+      "id": "US-3",
+      "as_a": "Demo Bank customer with an approved loan",
+      "i_want": "the approved funds credited directly to my Demo Bank current account on the same day",
+      "so_that": "I have immediate access to my funds electronically",
+      "priority": "Must",
+      "source_quote": "The decision should be automatic and the money should arrive in the customer's current account the same day.",
+      "acceptance_criteria": [
+        {
+          "id": "AC-3.1",
+          "given": "A loan application has reached Approved status before the same-day cut-off time specified in Q-5",
+          "when": "The loan disbursement engine executes",
+          "then": "The exact approved principal amount in ALL is credited to the customer's primary Demo Bank current account on the same calendar day"
+        },
+        {
+          "id": "AC-3.2",
+          "given": "The loan disbursement engine successfully transfers the loan amount to the current account",
+          "when": "The customer views their account balance in the mobile app",
+          "then": "The account balance reflects the credited funds and a corresponding transaction entry is visible"
+        },
+        {
+          "id": "AC-3.3",
+          "given": "A core banking integration timeout occurs during the disbursement transaction",
+          "when": "The disbursement retry service handles the failure per Q-8",
+          "then": "The system prevents duplicate disbursement and alerts the operational support team while maintaining an audit trail"
+        }
+      ]
+    }
+  ],
+  "uat_cases": [
+    {
+      "id": "TC-1",
+      "title": "Validate loan configuration boundaries and dynamic instalment calculation",
+      "covers": [
+        "AC-1.1",
+        "AC-1.2"
+      ],
+      "type": "positive",
+      "preconditions": "Customer is an authenticated mobile app user with verified Demo Bank salary deposits per Q-1.",
+      "steps": [
+        "Log into Demo Bank mobile app.",
+        "Navigate to 'Loans' and select 'Online Consumer Loan'.",
+        "Set loan amount to 500,000 ALL and term to 24 months (or valid boundary per Q-2).",
+        "Verify the displayed monthly instalment against the expected financial schedule per Q-7.",
+        "Adjust the term slider to 36 months and observe the monthly instalment update."
+      ],
+      "expected_result": "Loan configuration inputs accept valid amounts up to 1,000,000 ALL and dynamically refresh the monthly instalment calculation."
+    },
+    {
+      "id": "TC-2",
+      "title": "Attempt loan configuration with amount exceeding maximum threshold of 1,000,000 ALL",
+      "covers": [
+        "AC-1.3"
+      ],
+      "type": "boundary",
+      "preconditions": "Customer is an authenticated mobile app user eligible to apply.",
+      "steps": [
+        "Navigate to the loan configuration screen.",
+        "Manually enter an amount of 1,000,001 ALL in the loan amount field.",
+        "Attempt to proceed to the submission step."
+      ],
+      "expected_result": "The system displays an inline validation error stating the maximum loan limit is 1,000,000 ALL and disables the submit action."
+    },
+    {
+      "id": "TC-3",
+      "title": "Automated application approval for customer with good credit history",
+      "covers": [
+        "AC-2.1",
+        "AC-2.2"
+      ],
+      "type": "positive",
+      "preconditions": "Applicant has qualifying salary deposits in Demo Bank and clean credit history per Q-3.",
+      "steps": [
+        "Configure loan for 300,000 ALL for 12 months.",
+        "Review the monthly instalment calculation.",
+        "Provide regulatory consent and tap 'Submit Application'.",
+        "Wait for automated decision engine processing."
+      ],
+      "expected_result": "The system completes processing automatically without manual queue referral and displays an 'Application Approved' screen."
+    },
+    {
+      "id": "TC-4",
+      "title": "Automated application rejection for customer with bad credit history",
+      "covers": [
+        "AC-2.1",
+        "AC-2.3"
+      ],
+      "type": "negative",
+      "preconditions": "Applicant has salary deposits in Demo Bank but has recorded arrears/adverse credit history per Q-3.",
+      "steps": [
+        "Configure loan for 200,000 ALL for 12 months.",
+        "Provide consent and submit the application.",
+        "Allow the automated decision engine to query the credit bureau / internal records."
+      ],
+      "expected_result": "The application is automatically rejected without manual referral, and a rejection screen per Q-6 is presented."
+    },
+    {
+      "id": "TC-5",
+      "title": "Same-day disbursement execution to customer current account",
+      "covers": [
+        "AC-3.1",
+        "AC-3.2"
+      ],
+      "type": "positive",
+      "preconditions": "Loan application is approved at 10:00 AM on a business day (before cut-off defined in Q-5); customer current account balance is 5,000 ALL.",
+      "steps": [
+        "Finalize contract signing for approved loan of 400,000 ALL.",
+        "Trigger automated disbursement service.",
+        "Query current account balance and statement in mobile banking on the same calendar day."
+      ],
+      "expected_result": "Customer current account is credited with exactly 400,000 ALL on the same day, bringing balance to 405,000 ALL with transaction narrative visible."
+    },
+    {
+      "id": "TC-6",
+      "title": "Disbursement failure handling and duplicate execution prevention",
+      "covers": [
+        "AC-3.3"
+      ],
+      "type": "negative",
+      "preconditions": "Loan application is approved, but core banking payment gateway is simulated to return a 504 Gateway Timeout during disbursement.",
+      "steps": [
+        "Trigger loan disbursement for an approved application.",
+        "Simulate core banking communication timeout during credit posting.",
+        "Verify system state, customer ledger, and retry queue behavior per Q-8."
+      ],
+      "expected_result": "The system does not disburse duplicate funds, logs a transaction alert, and marks the record for safe reconciliation without loss of funds."
+    }
+  ]
+}
